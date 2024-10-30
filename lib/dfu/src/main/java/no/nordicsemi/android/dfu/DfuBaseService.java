@@ -1044,24 +1044,24 @@ public abstract class DfuBaseService extends IntentService implements DfuProgres
 		final LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
 		final IntentFilter actionFilter = makeDfuActionIntentFilter();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-			this.registerReceiver(mDfuActionReceiver, actionFilter, RECEIVER_NOT_EXPORTED);
+			registerReceiver(mDfuActionReceiver, actionFilter, RECEIVER_NOT_EXPORTED);
 		} else {
 			manager.registerReceiver(mDfuActionReceiver, actionFilter);
 		}
-		ContextCompat.registerReceiver(this, mDfuActionReceiver, actionFilter, ContextCompat.RECEIVER_NOT_EXPORTED); // Additionally we must register this receiver as a non-local to get broadcasts from the notification actions
+		ContextCompat.registerReceiver(this, mDfuActionReceiver, actionFilter, ContextCompat.RECEIVER_EXPORTED); // Additionally we must register this receiver as a non-local to get broadcasts from the notification actions
 
 		final IntentFilter filter = new IntentFilter();
 		// As we no longer perform any action based on this broadcast, we may log all ACL events
 		filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
 		filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
 		filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-		ContextCompat.registerReceiver(mConnectionStateBroadcastReceiver, filter, ContextCompat.RECEIVER_EXPORTED);
+		ContextCompat.registerReceiver(this, mConnectionStateBroadcastReceiver, filter, ContextCompat.RECEIVER_EXPORTED);
 
 		final IntentFilter bondFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-		ContextCompat.registerReceiver(mBondStateBroadcastReceiver, bondFilter, ContextCompat.RECEIVER_EXPORTED);
+		ContextCompat.registerReceiver(this, mBondStateBroadcastReceiver, bondFilter, ContextCompat.RECEIVER_EXPORTED);
 
 		final IntentFilter stateFilter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-		ContextCompat.registerReceiver(mBluetoothStateBroadcastReceiver, stateFilter, ContextCompat.RECEIVER_EXPORTED);
+		ContextCompat.registerReceiver(this, mBluetoothStateBroadcastReceiver, stateFilter, ContextCompat.RECEIVER_EXPORTED);
 	}
 
 	@Override

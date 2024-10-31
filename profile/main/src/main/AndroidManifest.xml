@@ -36,6 +36,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application>
-        <service android:name=".repository.DFUService" />
+        <service android:name=".repository.DFUService"
+                 android:foregroundServiceType="connectedDevice" />
     </application>
 </manifest>

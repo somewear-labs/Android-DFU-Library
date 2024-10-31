@@ -1047,7 +1047,7 @@ public abstract class DfuBaseService extends IntentService implements DfuProgres
 			registerReceiver(mDfuActionReceiver, actionFilter, RECEIVER_EXPORTED);
 		} else {
 			manager.registerReceiver(mDfuActionReceiver, actionFilter);
-			ContextCompat.registerReceiver(this, mDfuActionReceiver, actionFilter, ContextCompat.RECEIVER_EXPORTED); /
+			ContextCompat.registerReceiver(this, mDfuActionReceiver, actionFilter, ContextCompat.RECEIVER_EXPORTED);
 		}
 
 		final IntentFilter filter = new IntentFilter();

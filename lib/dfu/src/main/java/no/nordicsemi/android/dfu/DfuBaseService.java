@@ -1044,11 +1044,11 @@ public abstract class DfuBaseService extends IntentService implements DfuProgres
 		final LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
 		final IntentFilter actionFilter = makeDfuActionIntentFilter();
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-			registerReceiver(mDfuActionReceiver, actionFilter, RECEIVER_NOT_EXPORTED);
+			registerReceiver(mDfuActionReceiver, actionFilter, RECEIVER_EXPORTED);
 		} else {
 			manager.registerReceiver(mDfuActionReceiver, actionFilter);
+			ContextCompat.registerReceiver(this, mDfuActionReceiver, actionFilter, ContextCompat.RECEIVER_EXPORTED);
 		}
-		ContextCompat.registerReceiver(this, mDfuActionReceiver, actionFilter, ContextCompat.RECEIVER_EXPORTED); // Additionally we must register this receiver as a non-local to get broadcasts from the notification actions
 
 		final IntentFilter filter = new IntentFilter();
 		// As we no longer perform any action based on this broadcast, we may log all ACL events

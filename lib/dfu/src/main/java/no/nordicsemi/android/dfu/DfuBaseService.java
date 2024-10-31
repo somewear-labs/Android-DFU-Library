@@ -1913,7 +1913,9 @@ public abstract class DfuBaseService extends IntentService implements DfuProgres
 		// Any additional configuration?
 		updateForegroundNotification(builder);
 
-		startForeground(NOTIFICATION_ID, builder.build(), FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			startForeground(NOTIFICATION_ID, builder.build(), FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE);
+		}
 	}
 
 	/**

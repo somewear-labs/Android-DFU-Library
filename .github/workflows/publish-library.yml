@@ -1,0 +1,31 @@
+name: Run Ruby Script
+
+on:
+  workflow_dispatch: # Allows manual triggering from the GitHub Actions UI
+    inputs:
+      script_argument:
+        description: 'Argument to pass to the Ruby script'
+        required: true
+        default: ''
+
+jobs:
+  run-ruby-script:
+    runs-on: ubuntu-latest # Use an Ubuntu runner
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Ensures the full repository is cloned
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2' # Specify the Ruby version you need
+          bundler-cache: true # Cache installed gems for faster execution
+
+      - name: Run Ruby script
+        run: |
+          ruby script/github-mvn-publish.rb -u 'https://github.com/somewear-labs/Android-DFU-Library' -m lib:dfu -t "$INPUT_ARGUMENT" -v "$INPUT_ARGUMENT"
+        env:
+          INPUT_ARGUMENT: ${{ inputs.script_argument }}

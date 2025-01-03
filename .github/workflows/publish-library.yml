@@ -1,31 +1,77 @@
-name: Run Ruby Script
+name: Publish Android Library
 
 on:
-  workflow_dispatch: # Allows manual triggering from the GitHub Actions UI
+  workflow_dispatch:
     inputs:
-      script_argument:
-        description: 'Argument to pass to the Ruby script'
-        required: true
-        default: ''
+      tag:
+        description: 'Git tag to publish'
+        required: false
+        type: string
+      branch:
+        description: 'Git branch to publish'
+        required: false
+        type: string
+      commit:
+        description: 'Git commit hash to publish'
+        required: false
+        type: string
+      version:
+        description: 'Custom artifact version (optional)'
+        required: false
+        type: string
 
 jobs:
-  run-ruby-script:
-    runs-on: ubuntu-latest # Use an Ubuntu runner
+  publish:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Ensures the full repository is cloned
+          fetch-depth: 0
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Set up Java
+        uses: actions/setup-java@v3
         with:
-          ruby-version: '3.2' # Specify the Ruby version you need
-          bundler-cache: true # Cache installed gems for faster execution
+          distribution: 'zulu'
+          java-version: '21'
 
-      - name: Run Ruby script
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Set up Maven settings
         run: |
-          ruby script/github-mvn-publish.rb -u 'https://github.com/somewear-labs/Android-DFU-Library' -m lib:dfu -t "$INPUT_ARGUMENT" -v "$INPUT_ARGUMENT"
-        env:
-          INPUT_ARGUMENT: ${{ inputs.script_argument }}
+          mkdir -p ~/.m2
+          echo "<settings>\n" > ~/.m2/settings.xml
+          echo "  <servers>\n" >> ~/.m2/settings.xml
+          echo "    <server>\n" >> ~/.m2/settings.xml
+          echo "      <id>private-maven-repo</id>\n" >> ~/.m2/settings.xml
+          echo "      <username>${{ secrets.MAVEN_USERNAME }}</username>\n" >> ~/.m2/settings.xml
+          echo "      <password>${{ secrets.MAVEN_PASSWORD }}</password>\n" >> ~/.m2/settings.xml
+          echo "    </server>\n" >> ~/.m2/settings.xml
+          echo "  </servers>\n" >> ~/.m2/settings.xml
+          echo "</settings>" >> ~/.m2/settings.xml
+
+      - name: Check out specific ref
+        run: |
+          if [[ "${{ inputs.tag }}" != "" ]]; then
+            git checkout tags/${{ inputs.tag }}
+          elif [[ "${{ inputs.branch }}" != "" ]]; then
+            git checkout ${{ inputs.branch }}
+          elif [[ "${{ inputs.commit }}" != "" ]]; then
+            git checkout ${{ inputs.commit }}
+          else
+            echo "No tag, branch, or commit specified. Aborting."
+            exit 1
+          fi
+
+      - name: Build and Publish Library
+        run: |
+          ./gradlew lib:dfu:assemble
+          ./gradlew lib:dfu:publish \
+            -Pmaven.repo.url=https://somewear-artifacts.appspot.com \
+            -Pmaven.repo.username=${{ secrets.MAVEN_USERNAME }} \
+            -Pmaven.repo.password=${{ secrets.MAVEN_PASSWORD }}
+
+      - name: Confirm Success
+        run: echo "Library published successfully."

@@ -88,6 +88,8 @@ public final class DfuServiceInitiator {
 	private boolean disableNotification = false;
 	private boolean startAsForegroundService = true;
 
+	private String bootloaderScannerCustomDeviceAddress;
+
 	private Uri fileUri;
 	private String filePath;
 	private int fileResId;
@@ -663,6 +665,19 @@ public final class DfuServiceInitiator {
 	}
 
 	/**
+	 * Set an optional custom device address to supply the {@link BootloaderScannerFactory}
+	 * when it scans for the DFU Bootloader. This scanner will look for the bootloader
+	 * at the given custom device address.
+	 *
+	 * If this method is not called, the scanner will look for the bootloader
+	 * at the device address supplied in the {@link DfuServiceInitiator} constructor.
+	 */
+	public DfuServiceInitiator setScanForBootloaderAtCustomDeviceAddress(final String bootloaderScannerCustomDeviceAddress) {
+		this.bootloaderScannerCustomDeviceAddress = bootloaderScannerCustomDeviceAddress;
+		return this;
+	}
+
+	/**
 	 * Sets the URI to the Distribution packet (ZIP) or to a ZIP file matching the deprecated naming
 	 * convention.
 	 *
@@ -896,6 +911,9 @@ public final class DfuServiceInitiator {
 			intent.putExtra(DfuBaseService.EXTRA_CUSTOM_UUIDS_FOR_BUTTONLESS_DFU_WITHOUT_BOND_SHARING, buttonlessDfuWithoutBondSharingUuids);
 		if (buttonlessDfuWithBondSharingUuids != null)
 			intent.putExtra(DfuBaseService.EXTRA_CUSTOM_UUIDS_FOR_BUTTONLESS_DFU_WITH_BOND_SHARING, buttonlessDfuWithBondSharingUuids);
+		if (bootloaderScannerCustomDeviceAddress != null) {
+			intent.putExtra(DfuBaseService.EXTRA_CUSTOM_BOOTLOADER_SCANNER_DEVICE_ADDRESS, bootloaderScannerCustomDeviceAddress);
+		}
 
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && startAsForegroundService) {
 			// On Android Oreo and above the service must be started as a foreground service to make it accessible from

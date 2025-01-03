@@ -70,6 +70,7 @@ import no.nordicsemi.android.dfu.internal.exception.DeviceDisconnectedException;
 import no.nordicsemi.android.dfu.internal.exception.DfuException;
 import no.nordicsemi.android.dfu.internal.exception.SizeValidationException;
 import no.nordicsemi.android.dfu.internal.exception.UploadAbortedException;
+import no.nordicsemi.android.dfu.internal.scanner.BootloaderScannerFactory;
 import no.nordicsemi.android.error.GattError;
 
 /**
@@ -746,6 +747,14 @@ public abstract class DfuBaseService extends IntentService implements DfuProgres
 	public static final String EXTRA_CUSTOM_UUIDS_FOR_BUTTONLESS_DFU_WITHOUT_BOND_SHARING = "no.nordicsemi.android.dfu.extra.EXTRA_CUSTOM_UUIDS_FOR_BUTTONLESS_DFU_WITHOUT_BOND_SHARING";
 	public static final String EXTRA_CUSTOM_UUIDS_FOR_BUTTONLESS_DFU_WITH_BOND_SHARING = "no.nordicsemi.android.dfu.extra.EXTRA_CUSTOM_UUIDS_FOR_BUTTONLESS_DFU_WITH_BOND_SHARING";
 
+	public static final String EXTRA_CUSTOM_BOOTLOADER_SCANNER_DEVICE_ADDRESS = "no.nordicsemi.android.dfu.extra.EXTRA_CUSTOM_BOOTLOADER_SCANNER_DEVICE_ADDRESS";
+
+	/**
+	 * An optional custom device address to supply the {@link BootloaderScannerFactory}
+	 * when it scans for the DFU Bootloader.
+	 */
+	public String mBootloaderScannerCustomDeviceAddress;
+
 	/**
 	 * Lock used in synchronization purposes
 	 */
@@ -1216,6 +1225,11 @@ public abstract class DfuBaseService extends IntentService implements DfuProgres
 			mbrSize = intent.getIntExtra(EXTRA_MBR_SIZE, DfuServiceInitiator.DEFAULT_MBR_SIZE);
 			if (mbrSize < 0)
 				mbrSize = 0;
+		}
+
+		mBootloaderScannerCustomDeviceAddress = intent.getStringExtra(DfuBaseService.EXTRA_CUSTOM_BOOTLOADER_SCANNER_DEVICE_ADDRESS);
+		if (mBootloaderScannerCustomDeviceAddress != null) {
+			sendLogBroadcast(LOG_LEVEL_VERBOSE, "A custom device address for the DFU bootloader scanner was supplied; deviceAddress=" + mBootloaderScannerCustomDeviceAddress);
 		}
 
 		sendLogBroadcast(LOG_LEVEL_VERBOSE, "DFU service started");

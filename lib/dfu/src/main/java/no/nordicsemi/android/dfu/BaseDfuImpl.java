@@ -113,6 +113,11 @@ import no.nordicsemi.android.dfu.internal.scanner.BootloaderScannerFactory;
 	int mInitPacketSizeInBytes;
 	private int mCurrentMtu;
 
+	/**
+	 * An optional custom device address to supply the {@link BootloaderScannerFactory}
+	 * when it scans for the DFU Bootloader.
+	 */
+
 	protected class BaseBluetoothGattCallback extends DfuGattCallback {
 		// The Implementation object is created depending on device services, so after the device
         // is connected and services were scanned.
@@ -812,15 +817,24 @@ import no.nordicsemi.android.dfu.internal.scanner.BootloaderScannerFactory;
 	 */
 	void restartService(@NonNull final Intent intent, final boolean scanForBootloader, @NonNull final UUID serviceUuid) {
 		String newAddress = null;
+		String bootloaderScannerDeviceAddress;
 		if (scanForBootloader) {
 			final long delay = intent.getLongExtra(DfuBaseService.EXTRA_SCAN_DELAY, 0);
 			final long timeout = intent.getLongExtra(DfuBaseService.EXTRA_SCAN_TIMEOUT, DfuServiceInitiator.DEFAULT_SCAN_TIMEOUT);
 			mService.sendLogBroadcast(DfuBaseService.LOG_LEVEL_VERBOSE, "Scanning for the DFU Bootloader... (timeout " + timeout + " ms)");
 			if (delay > 0)
 				mService.waitFor(delay);
+
+			if (mService.mBootloaderScannerCustomDeviceAddress != null) {
+				bootloaderScannerDeviceAddress = mService.mBootloaderScannerCustomDeviceAddress;
+			} else {
+				bootloaderScannerDeviceAddress = mGatt.getDevice().getAddress();
+			}
+
+
 			logi("Scanning for the DFU Bootloader... (timeout " + timeout + " ms)");
 			newAddress = BootloaderScannerFactory
-					.getScanner(mGatt.getDevice().getAddress(), serviceUuid)
+					.getScanner(bootloaderScannerDeviceAddress, serviceUuid)
 					.searchUsing(mService.getDeviceSelector(), timeout);
 			logi("Scanning for new address finished with: " + newAddress);
 			if (newAddress != null)

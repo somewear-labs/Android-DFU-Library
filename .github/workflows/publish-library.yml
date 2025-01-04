@@ -39,19 +39,6 @@ jobs:
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Set up Maven settings
-        run: |
-            mkdir -p ~/.m2
-            echo "<settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\">" > ~/.m2/settings.xml
-            echo "  <servers>" >> ~/.m2/settings.xml
-            echo "    <server>" >> ~/.m2/settings.xml
-            echo "      <id>somewear-artifacts</id>" >> ~/.m2/settings.xml
-            echo "      <username>${{ secrets.MAVEN_USERNAME }}</username>" >> ~/.m2/settings.xml
-            echo "      <password>${{ secrets.MAVEN_PASSWORD }}</password>" >> ~/.m2/settings.xml
-            echo "    </server>" >> ~/.m2/settings.xml
-            echo "  </servers>" >> ~/.m2/settings.xml
-            echo "</settings>" >> ~/.m2/settings.xml
-
       - name: Check out specific ref
         run: |
           if [[ "${{ inputs.tag }}" != "" ]]; then
@@ -65,13 +52,22 @@ jobs:
             exit 1
           fi
 
-      - name: Build and Publish Library
+      - name: Build Library
         run: |
           ./gradlew lib:dfu:assemble
-          ./gradlew lib:dfu:publish \
-            -Pmaven.repo.url=https://somewear-artifacts.appspot.com \
-            -Pmaven.repo.username=${{ secrets.MAVEN_USERNAME }} \
-            -Pmaven.repo.password=${{ secrets.MAVEN_PASSWORD }}
+
+      - name: Deploy Library artifact to Maven repository
+        run: |
+          mvn deploy:deploy-file \
+            -DgroupId=com.somewear \
+            -DartifactId=android-dfu-library \
+            -Dversion=${{ inputs.version }} \
+            -Dpackaging=aar \
+            -Dfile=lib/dfu/build/outputs/aar/dfu-release.aar \
+            -DrepositoryId=somewear-artifacts \
+            -Durl=https://somewear-artifacts.appspot.com \
+            -Dusername=${{ secrets.MAVEN_USERNAME }} \
+            -Dpassword=${{ secrets.MAVEN_PASSWORD }    
 
       - name: Confirm Success
         run: echo "Library published successfully."

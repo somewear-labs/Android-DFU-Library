@@ -16,8 +16,8 @@ on:
         required: false
         type: string
       version:
-        description: 'Custom artifact version (optional)'
-        required: false
+        description: 'Artifact version'
+        required: true
         type: string
 
 jobs:
@@ -51,6 +51,21 @@ jobs:
             echo "No tag, branch, or commit specified. Aborting."
             exit 1
           fi
+          
+      - name: Create Maven settings file
+        run: |
+          mkdir -p ~/.m2
+          cat <<EOL > ~/.m2/settings.xml
+          <settings>
+              <servers>
+                  <server>
+                      <id>somewear-artifacts</id>
+                      <username>${{ secrets.MAVEN_USERNAME }}</username>
+                      <password>${{ secrets.MAVEN_PASSWORD }}</password>
+                  </server>
+              </servers>
+          </settings>
+          EOL     
 
       - name: Build Library
         run: |
@@ -66,8 +81,6 @@ jobs:
             -Dfile=lib/dfu/build/outputs/aar/dfu-release.aar \
             -DrepositoryId=somewear-artifacts \
             -Durl=https://somewear-artifacts.appspot.com \
-            -Dusername=${{ secrets.MAVEN_USERNAME }} \
-            -Dpassword=${{ secrets.MAVEN_PASSWORD }}    
 
       - name: Confirm Success
         run: echo "Library published successfully."

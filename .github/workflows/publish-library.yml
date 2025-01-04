@@ -41,16 +41,18 @@ jobs:
 
       - name: Set up Maven settings
         run: |
-          mkdir -p ~/.m2
-          echo "<settings>\n" > ~/.m2/settings.xml
-          echo "  <servers>\n" >> ~/.m2/settings.xml
-          echo "    <server>\n" >> ~/.m2/settings.xml
-          echo "      <id>private-maven-repo</id>\n" >> ~/.m2/settings.xml
-          echo "      <username>${{ secrets.MAVEN_USERNAME }}</username>\n" >> ~/.m2/settings.xml
-          echo "      <password>${{ secrets.MAVEN_PASSWORD }}</password>\n" >> ~/.m2/settings.xml
-          echo "    </server>\n" >> ~/.m2/settings.xml
-          echo "  </servers>\n" >> ~/.m2/settings.xml
-          echo "</settings>" >> ~/.m2/settings.xml
+            mkdir -p ~/.m2
+            cat <<EOL > ~/.m2/settings.xml
+        <settings>
+          <servers>
+            <server>
+              <id>somewear-artifacts</id>
+              <username>${{ secrets.MAVEN_USERNAME }}</username>
+              <password>${{ secrets.MAVEN_PASSWORD }}</password>
+            </server>
+          </servers>
+        </settings>
+        EOL
 
       - name: Check out specific ref
         run: |

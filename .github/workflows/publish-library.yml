@@ -67,7 +67,7 @@ jobs:
             -DrepositoryId=somewear-artifacts \
             -Durl=https://somewear-artifacts.appspot.com \
             -Dusername=${{ secrets.MAVEN_USERNAME }} \
-            -Dpassword=${{ secrets.MAVEN_PASSWORD }    
+            -Dpassword=${{ secrets.MAVEN_PASSWORD }}    
 
       - name: Confirm Success
         run: echo "Library published successfully."

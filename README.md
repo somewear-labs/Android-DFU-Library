@@ -1,4 +1,4 @@
-[ ![Download](https://maven-badges.herokuapp.com/maven-central/no.nordicsemi.android/dfu/badge.svg?style=plastic) ](https://search.maven.org/artifact/no.nordicsemi.android/dfu)
+![Build Status](https://github.com/somewear-labs/Android-DFU-Library/actions/workflows/build-main.yml/badge.svg)
 
 # Device Firmware Update
 

@@ -1,5 +1,30 @@
 ![Build Status](https://github.com/somewear-labs/Android-DFU-Library/actions/workflows/build-main.yml/badge.svg)
 
+# Android DFU Library
+
+This library provides Device Firmware Update (DFU) functionality specifically for the Somewear Labs Hotspot, supporting both Android and ATAK clients.
+
+## Compatibility
+
+- Somewear Labs Hotspot devices only
+- Android clients
+- ATAK clients
+
+## Release Process
+
+To create a new release:
+
+1. Merge your changes into the _main_ branch
+2. Create a new release tag following the format: `Android DFU X.X.X` (e.g., `Android DFU 2.11.0`)
+3. Navigate to the [Publish Library Action](https://github.com/somewear-labs/Android-DFU-Library/actions/workflows/publish-library.yml)
+4. Run the GitHub Action to publish the Maven artifact to the Somewear Labs Maven repository
+5. Reference accordingly in gradle in the given project
+
+
+## Existing DFU Readme Below for informational porposes only 
+--------
+
+
 # Device Firmware Update
 
 Update nRF5 SDK firmware using Bluetooth LE.

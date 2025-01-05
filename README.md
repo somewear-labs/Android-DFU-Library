@@ -21,9 +21,7 @@ To create a new release:
 5. Reference accordingly in gradle in the given project
 
 
-## Existing DFU Readme Below for informational porposes only 
---------
-
+## Existing DFU Readme Below for informational purposes only 
 
 # Device Firmware Update
 

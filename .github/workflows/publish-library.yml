@@ -72,7 +72,7 @@ jobs:
       - name: Deploy Library artifact to Maven repository
         run: |
           mvn deploy:deploy-file \
-            -DgroupId=com.github.somewear-labs \
+            -DgroupId=com.github.somewear-labs.dfu \
             -DartifactId=android-dfu-library \
             -Dversion=${{ inputs.version }} \
             -Dpackaging=aar \
